@@ -355,7 +355,7 @@ class QuotationController extends Controller
 
 
         if ($model2->load(Yii::$app->request->post()) ) {
-            
+
             $model2->quotation_id = $id;
             $model2->save();
 
@@ -373,7 +373,20 @@ class QuotationController extends Controller
 
     }
 
+    public function actionSavedesc()
+    {
+        $stockid = $_POST['id'];
+        $desc = strip_tags($_POST['desc']);
 
+        $model = Stock::find()
+                ->where(['id'=>$stockid])
+                ->one();
+        $model->DESCRIPTION = $desc;
+        $model->date_update = date('Y-m-d h:i:s');
+        $model->update_by = Yii::$app->user->identity->id;
+
+        $model->save();
+    }
 
     public function actionAll($id){
 
@@ -433,7 +446,7 @@ class QuotationController extends Controller
         echo "data: {id: v},";
         echo "success: function(data) {";
         echo "$('#extra-desc').text(data);";
-        echo "$('p').text(data);";
+        echo "$('.note-editable > p').text(data);";
         echo "}";
         echo "});";
         echo "});";

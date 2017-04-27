@@ -19,9 +19,62 @@ $stock = ArrayHelper::map(Stock::find()->where(['id'=>$model2->stock_id])->asArr
 $this->title = 'Quotation No : ' .$model->quotation_no.''.$model->revise;
 $this->params['breadcrumbs'][] = ['label' => 'Quotations', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
+
+$script = <<< JS
+$(document).ready(function(){
+    $('.note-editable').keyup(function() {
+        if($('.searchGlobal').val() == ''){
+
+        }
+        else{
+            $('.savedesc_stock').show();
+            $('.infosave').show();
+        }
+        
+    });
+
+    $('#checkbox6').click(function(){
+            
+            $('.loading').show();
+            var a = $('#stock-id-get option:selected').val();
+            var b = $('#extra-desc').val();
+            $.ajax({
+            type: 'POST',
+            url: 'savedesc',
+            data: {id: a,desc: b},
+            success: function(data) {
+                setTimeout(function(){ 
+                    $('.loading').hide(); 
+                    $('.successsave').show(); 
+                }, 2500);
+            }
+          });
+
+    });
+
+
+
+});
+JS;
+$this->registerJs($script);
+
 ?>
-
-
+<style type="text/css">
+    .loading {
+    
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .5 ) 
+                url('<?php echo Yii::$app->request->baseUrl ?>/theme/assets/layouts/layout2/img/anim-loading.gif') 
+                50% 50% 
+                no-repeat;
+}
+</style>
+<div class="loading" style="display: none;"></div>
 <?php if ($model->status == "Confirm") { ?>
 
 <div class="row">
@@ -189,6 +242,24 @@ $this->params['breadcrumbs'][] = $this->title;
 
     ]) ?>
 
+    <div class="infosave" style="display: none">
+        <div class="note note-warning">
+            If you click hyperlink below, the additional description you entered above will override the existing stock description in database stock. Please confirm first before you click. <strong>Ignore</strong> hyperlink below if you do not want to override the description above with database stock.
+        </div>
+    </div>
+
+    <div class="savedesc_stock" style="display: none">
+        <span class='font-red-soft font-md'>Save Description ? - </span>
+        <a href="#" id="checkbox6">CLICK HERE</a>
+        
+    </div>
+    <br>
+    <div class="successsave" style="display: none">
+        <div class="note note-success">
+            The description above was successfully saved.
+        </div>
+    </div>
+    
     <?= $form->field($model2, 'quantity')->textInput(['value'=>1,'class'=>'form-control']) ?>
 
     <?= $form->field($model2, 'unit')->dropDownList($uom,[
